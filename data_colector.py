@@ -1,9 +1,10 @@
+import math
 import numpy as np
 import pandas as pd
 import helper
 import fit_equations as fe
 
-def atom_data(input_file,headers_dict,atom_count,element_data):
+def atom_data(input_file,headers_dict,atom_count,element_data,types_dict):
 
     lammps_data = np.loadtxt(input_file,
                          skiprows=headers_dict['Atoms'] + 2,
@@ -14,13 +15,13 @@ def atom_data(input_file,headers_dict,atom_count,element_data):
     atom_data = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
 
 
-    ff_types = generate_ff(headers_dict, open(input_file).readlines(), element_data)
+    ff_types = generate_ff(headers_dict, open(input_file).readlines(), element_data,types_dict)
     element_mapping = dict(zip(ff_types['type_number'], ff_types['element']))
     type_mapping = dict(zip(ff_types['type_number'], ff_types['type']))
 
     atom_data['element'] = atom_data['atom_type'].map(element_mapping)
     atom_data['gro_type'] = atom_data['atom_type'].map(type_mapping)
-    return atom_data
+    return atom_data,ff_types
 
 def bond_data(input_file,headers_dict,bond_count,atom_data):
 
@@ -67,9 +68,6 @@ def angle_data(input_file,headers_dict,angle_count,atom_data):
     angle_data['element_j'] = angle_data['aj'].apply(lambda x: helper.atom_id_to_type(x,atom_data))
     angle_data['element_k'] = angle_data['ak'].apply(lambda x: helper.atom_id_to_type(x,atom_data))
 
-    #angle_types_coeffs = angle_data[['angle_type', 'element_i', 'element_j','element_k']].drop_duplicates()
-    #angle_types_coeffs = angle_types_coeffs.sort_values(by='angle_type').reset_index(drop=True)
-
     return angle_data
 
 def angle_coeffs(input_file, angle_data, headers_dict, angle_types):
@@ -109,8 +107,10 @@ def angle_coeffs(input_file, angle_data, headers_dict, angle_types):
         angle_coeffs=pd.DataFrame(lammps_data, columns=column_names)
          
     angle_coeffs['k_eff_gromacs']=angle_coeffs['k_eff_lammps']*4.184
+    angle_types_coeffs = angle_data[['angle_type', 'element_i', 'element_j','element_k']].drop_duplicates()
+    angle_types_coeffs = angle_types_coeffs.sort_values(by='angle_type').reset_index(drop=True)
 
-    return angle_coeffs,angle_style
+    return angle_coeffs,angle_types_coeffs,angle_style
 
 def dihedral_improper_data(input_file, header_position, dihedral_count, atom_data):
     lammps_data = np.loadtxt(input_file,
@@ -152,7 +152,7 @@ def dihedral_coeffs(input_file, dihedral_data, headers_dict, dihedral_types):
 
     return dihedral_types_coeffs
 
-def get_improper_coeffs(input_file, improper_data, headers_dict, improper_types):
+def improper_coeffs(input_file, improper_data, headers_dict, improper_types):
    
     lammps_data = np.loadtxt(input_file,
                              skiprows=headers_dict['Improper Coeffs'] + 2,
@@ -167,15 +167,16 @@ def get_improper_coeffs(input_file, improper_data, headers_dict, improper_types)
     except:
         improper_coeffs=pd.DataFrame(lammps_data, columns=column_names)
 
-        improper_coeffs[['k_eff_lammps', 'theta0_deg']] =improper_coeffs.apply(
-        lambda row: fe.get_fourier_harmonic_params(K_fourier=row['k_lammps'],
+    improper_coeffs[['k_eff_lammps', 'theta0_deg']] =improper_coeffs.apply(
+    lambda row: fe.get_fourier_harmonic_params(K_fourier=row['k_lammps'],
                                       C0=row['C0_lammps'],
                                       C1=row['C1_lammps'],
                                       C2=row['C2_lammps']), axis=1, result_type="expand")
     
     improper_coeffs['k_eff_gromacs']=improper_coeffs['k_eff_lammps']*4.184
 
-    improper_types_coeffs =  improper_data[['improper_type', 'element_i', 'element_j','element_k','element_l']].drop_duplicates()
+    improper_types_coeffs =  improper_data[['dihedral_type', 'element_i', 'element_j','element_k','element_l']].drop_duplicates()
+    improper_types_coeffs =  improper_types_coeffs.rename(columns={'dihedral_type':'improper_type'})
     improper_types_coeffs =  improper_types_coeffs.sort_values(by='improper_type').reset_index(drop=True)
 
     improper_types_coeffs = improper_types_coeffs.merge(
@@ -185,6 +186,34 @@ def get_improper_coeffs(input_file, improper_data, headers_dict, improper_types)
     )
     
     return improper_types_coeffs
+
+def extract_box_params(lines):
+    xy, xz, yz = 0,0,0
+    for line in lines:
+        if "xlo xhi" in line:
+            xlo, xhi = helper.extract_numbers(line)
+            lx = xhi - xlo
+        if "ylo yhi" in line:
+            ylo, yhi = helper.extract_numbers(line)
+            ly = yhi - ylo
+        if "zlo zhi" in line:
+            zlo, zhi = helper.extract_numbers(line)
+            lz = zhi - zlo
+        if "xy xz yz" in line:
+            xy, xz, yz = helper.extract_numbers(line)
+            break
+
+    a=lx
+    b=(ly**2+xy**2)**(1/2)
+    c=(lz**2+xz**2+yz**2)**(1/2)
+
+    alpha = (math.acos(((xy*xz)+(ly*yz))/(b*c)))*57.2958
+    beta = (math.acos(xz/c))*57.2958
+    gamma = (math.acos(xy/b))*57.2958
+
+    gro_box_str=f'    {lx/10:.5f} {ly/10:.5f} {lz/10:.5f} {0:.5f} {0:.5f} {xy/10:.5f} {0/10:.5f} {xz/10:.5f} {yz/10:.5f}'
+
+    return gro_box_str
 
 #=============================== AUXILIARY FUNCTIONS ===============================
 

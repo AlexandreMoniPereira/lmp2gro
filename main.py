@@ -7,6 +7,7 @@ import math
 
 import helper
 import data_colector as dc
+import data_writer as dw
 
 
 def create_output_folder(input_file):
@@ -22,16 +23,14 @@ def create_output_folder(input_file):
     return folder_name
 
 def gen_types_dict(lines):
-    
+    types_dict={}
     for each in lines: 
-        types_dict={}
-        
         if 'types' in each:
             line=each.split()
             variable=line[1]+'_'+line[2]
             value=line[0]
     
-            types_dict={variable:int(value)}
+            types_dict[variable] = int(value) 
     return types_dict
 
 
@@ -87,6 +86,7 @@ if __name__ == "__main__":
 
     #=================== Input name and creation of output folder  ===================
     input_file='data.MOF_5_opt_2x2x2'
+    resname='UNL'
 
     with open(input_file, 'r') as file:
         lines = file.readlines()
@@ -105,9 +105,11 @@ if __name__ == "__main__":
     headers_dict=gen_headers_dict(lines)
     gro_box_line=gen_gro_box(lines)
 
+    element_data=pd.read_csv( 'element_data.csv')
+
     #=================== Extracting Data ===================
 
-    atom_data=dc.atom_data(input_file,headers_dict,atom_count,dc.element_data)
+    atom_data,ff_types=dc.atom_data(input_file,headers_dict,atom_count,element_data,types_dict)
 
     if bond_count>0:
         bond_data=dc.bond_data(input_file,headers_dict,bond_count,atom_data)
@@ -115,7 +117,7 @@ if __name__ == "__main__":
 
     if angle_count>0:
         angle_data=dc.angle_data(input_file,headers_dict,angle_count,atom_data)
-        angle_coeffs,angle_style=dc.angle_coeffs(input_file, angle_data, headers_dict, types_dict['angle_types'])
+        angle_coeffs,angle_types_coeffs,angle_style=dc.angle_coeffs(input_file, angle_data, headers_dict, types_dict['angle_types'])
 
     if dihedral_count>0:
         dihedral_data=dc.dihedral_improper_data(input_file, headers_dict['Dihedrals'], dihedral_count, atom_data)
@@ -125,3 +127,24 @@ if __name__ == "__main__":
         improper_data=dc.dihedral_improper_data(input_file, headers_dict['Impropers'], improper_count, atom_data)
         improper_types_coeffs=dc.improper_coeffs(input_file, improper_data, headers_dict, types_dict['improper_types'])
 
+    #=================== Writing gromacs files ===================
+
+    dw.write_bonded_info(output_folder, types_dict, 
+                         bond_count, bond_types_coeffs,
+                         angle_count, angle_types_coeffs, angle_coeffs, angle_style,
+                         dihedral_count, dihedral_types_coeffs,
+                         improper_count, improper_types_coeffs)
+    
+    dw.write_molecule_itp(output_folder, resname, atom_count, atom_data,
+                       bond_count, bond_data,
+                       angle_count, angle_data, angle_style,
+                       dihedral_count, dihedral_data,
+                       improper_count, improper_data)
+    
+    
+    dw.write_atomtypes(ff_types, types_dict['atom_types'], output_folder)
+
+    gro_box_str=dc.extract_box_params(lines)
+    dw.write_gro_file(output_folder, atom_count, atom_data, resname,gro_box_str)
+
+    dw.write_topology(output_folder, resname)
