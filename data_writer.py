@@ -1,3 +1,5 @@
+import helper
+
 def write_bonded_info(folder_name, types_dict, 
                       bond_count, bond_types_coeffs,
                       angle_count, angle_types_coeffs, angle_coeffs, angle_style,
@@ -114,23 +116,36 @@ def write_molecule_itp(folder_name, resname, atom_count, atom_data,
         
 
         if bond_count>0:
-            if angle_style=='fourier':
-                ang_num=2
+            if helper.check_duplicate_bond_types(bond_data):
+                file.write(f'''
+[ bonds ]
+;     ai      aj   func           b0                 kb 
+''')
+        
+                for i in range(bond_count):
+                    line = (f"{int(bond_data['ai'][i]):>8}"
+                            f"{int(bond_data['aj'][i]):>8}"
+                            f"     1 "
+                            f"{bond_data['dist_gro'][i]:>20.6f}"
+                            f"{bond_data['kb_gro'][i]:>20.6f}\n")
+                    file.write(line)
             else:
-                ang_num=1
-
-            file.write(f'''
+                file.write(f'''
 [ bonds ]
 ;     ai      aj   func 
 ''')
         
-            for i in range(bond_count):
-                line = (f"{int(bond_data['ai'][i]):>8}"
-                        f"{int(bond_data['aj'][i]):>8}"
-                        f"     1 \n")
-                file.write(line)
+                for i in range(bond_count):
+                    line = (f"{int(bond_data['ai'][i]):>8}"
+                            f"{int(bond_data['aj'][i]):>8}"
+                            f"     1 \n")
+                    file.write(line)
 
         if angle_count>0:
+            if angle_style=='fourier':
+                ang_num=2
+            else:
+                ang_num=1
             file.write(f'''
 [ angles ]
 ;     ai      aj      ak   func 

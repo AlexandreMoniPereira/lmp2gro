@@ -115,6 +115,9 @@ if __name__ == "__main__":
         bond_data=dc.bond_data(input_file,headers_dict,bond_count,atom_data)
         bond_types_coeffs=dc.bond_coeffs(input_file, bond_data, headers_dict, types_dict['bond_types'])
 
+        if helper.check_duplicate_bond_types(bond_data):
+            bond_data=dc.complete_bond_data(bond_data,bond_types_coeffs)
+
     if angle_count>0:
         angle_data=dc.angle_data(input_file,headers_dict,angle_count,atom_data)
         angle_coeffs,angle_types_coeffs,angle_style=dc.angle_coeffs(input_file, angle_data, headers_dict, types_dict['angle_types'])
@@ -128,7 +131,7 @@ if __name__ == "__main__":
         improper_types_coeffs=dc.improper_coeffs(input_file, improper_data, headers_dict, types_dict['improper_types'])
 
     #=================== Writing gromacs files ===================
-
+    
     dw.write_bonded_info(output_folder, types_dict, 
                          bond_count, bond_types_coeffs,
                          angle_count, angle_types_coeffs, angle_coeffs, angle_style,

@@ -95,50 +95,38 @@ def get_fourier_gromos_params(K, C0, C1, C2):
 #=============================== LAMMPS fourier to gromacs harmonic ===============================
 def get_fourier_harmonic_params(K_fourier, C0, C1, C2):
     """
-    Calculates optimal parameters (k and theta0) for a harmonic potential
-    by fitting it to a LAMMPS Fourier potential within the 0 to 180 degree interval.
-
-    Args:
-        K_fourier (float): LAMMPS Fourier K parameter.
-        C0 (float): LAMMPS Fourier C0 parameter.
-        C1 (float): LAMMPS Fourier C1 parameter.
-        C2 (float): LAMMPS Fourier C2 parameter.
-
-    Returns:
-        tuple: Optimal k and theta0 for the harmonic potential.
+    Converts LAMMPS Fourier (kcal/mol) → GROMACS harmonic (kJ/mol/rad^2)
+    by fitting the harmonic potential near theta = 0 (radians).
     """
-    theta = np.linspace(0, 2 * np.pi, 1000)
-    theta_angle = theta * 180 / np.pi
 
-    # Calculate LAMMPS Fourier potential
-    E_fourier_list = []
-    for i in range(len(theta)):
-        E = K_fourier * (C0 + C1 * (np.cos(theta[i])) + C2 * (np.cos(2 * theta[i])))
-        E_fourier_list.append(E)
+    # --- 1. Angles for fitting (in RADIANS) ---
+    theta = np.linspace(-np.pi, np.pi, 1000)
+    theta_deg = theta * 180 / np.pi  # only for defining the fit interval
 
-    # Filter data to the 0 to 180 degree interval
-    fit_range_start = 0
-    fit_range_end = 90
+    # --- 2. Compute LAMMPS Fourier energy in kcal/mol ---
+    E_fourier = K_fourier * (C0 + C1*np.cos(theta) + C2*np.cos(2*theta))
 
-    theta_fit = theta_angle[(theta_angle >= fit_range_start) & (theta_angle <= fit_range_end)]
-    E_fit = np.array(E_fourier_list)[(theta_angle >= fit_range_start) & (theta_angle <= fit_range_end)]
+    # --- 3. Convert energies to kJ/mol BEFORE fitting ---
+    E_fourier = E_fourier * 4.184  # kcal → kJ
 
-    # Fix theta0 to 0
-    theta0_fixed = 0
+    # --- 4. Select fitting range: -60° to +60° ---
+    mask = (theta_deg >= -60) & (theta_deg <= 60)
+    theta_fit = theta[mask]      # radians
+    E_fit = E_fourier[mask]      # kJ/mol
 
-    # Define the objective function to minimize (sum of squared differences)
-    # This function now only takes k as a parameter
-    def objective_function(k):
-        E_harmonic_fit = k/2 * (theta_fit - theta0_fixed)**2
-        return np.sum((E_fit - E_harmonic_fit)**2)
+    # --- 5. Harmonic reference angle ---
+    theta0 = 0.0  # radians
 
-    # Find the optimal k using optimization
-    initial_k = K_fourier / 1000  # Example initial guess
+    # --- 6. Objective function: least squares ---
+    def objective(k):
+        E_harm = 0.5 * k * (theta_fit - theta0)**2
+        return np.sum((E_fit - E_harm)**2)
 
-    # Use bounds for k to be non-negative
-    bounds = [(0, None)]
+    # --- 7. Initial guess: correct scale (kJ/mol/rad²) ---
+    initial_k = K_fourier * 4.184
 
-    result = minimize(objective_function, initial_k, bounds=bounds)
-    optimal_k = result.x[0]*4.184  # Convert to GROMACS units
+    # --- 8. Optimize k ---
+    result = minimize(objective, x0=[initial_k], bounds=[(0, None)])
+    k_opt = float(result.x[0])  # already in kJ/mol/rad²
 
-    return optimal_k, theta0_fixed
+    return k_opt, theta0
