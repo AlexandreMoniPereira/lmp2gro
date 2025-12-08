@@ -1,0 +1,65 @@
+; Run control
+integrator               = sd       ; Langevin dynamics
+tinit                    = 0
+dt                       = 0.001
+nsteps                   = 10000000    ; 10000 ps
+nstcomm                  = 100
+; Output control
+nstxout                  = 0
+nstvout                  = 0
+nstfout                  = 0
+nstlog                   = 500
+nstenergy                = 500
+nstxout-compressed       = 500
+; Neighborsearching and short-range nonbonded interactions
+cutoff-scheme            = verlet
+nstlist                  = 100
+ns_type                  = grid
+pbc                      = xyz
+rlist                    = 1.2
+; Electrostatics
+coulombtype              = PME
+rcoulomb                 = 1.2
+; van der Waals
+vdwtype                  = cutoff
+vdw-modifier             = potential-switch
+rvdw-switch              = 1.0
+rvdw                     = 1.2
+; Apply long range dispersion corrections for Energy and Pressure
+DispCorr                  = EnerPres
+; Spacing for the PME/PPPM FFT grid
+fourierspacing           = 0.12
+; EWALD/PME/PPPM parameters
+pme_order                = 4
+ewald_rtol               = 1e-06
+epsilon_surface          = 0
+; Temperature coupling
+; tcoupl is implicitly handled by the sd integrator
+tc_grps                  = system
+Tcoupl			 = v-rescale
+tau_t                    = 1.0
+ref_t                    = 298
+; Pressure coupling is on for NPT
+Pcoupl                   = no
+; Do not generate velocities
+; GENERATE VELOCITIES FOR STARTUP RUN
+gen-vel                  = yes
+gen-temp                 = 298
+gen-seed                 = 173529
+; options for bonds
+constraints              = h-bonds  ; we only have C-H bonds here
+; Type of constraint algorithm
+constraint-algorithm     = lincs
+; Constrain the starting configuration
+; since we are continuing from NVT
+continuation             = yes 
+; Highest order in the expansion of the constraint coupling matrix
+lincs-order              = 4
+; Number of iterations in the final step of LINCS. 1 is fine for
+; normal simulations, but use 2 to conserve energy in NVE runs.
+; For energy minimization with constraints it should be 4 to 8.
+lincs-iter               = 1
+; Lincs will write a warning to the stderr if in one step a bond
+; rotates over more degrees than
+lincs-warnangle          = 30
+

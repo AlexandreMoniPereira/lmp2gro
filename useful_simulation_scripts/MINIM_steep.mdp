@@ -1,0 +1,28 @@
+
+define                   = 
+integrator               = steep
+nsteps                   = 10000
+nstcgsteep               = 10
+constraints              = none
+lincs_order              = 8
+emtol                    = 20
+emstep                   = 0.01
+comm-mode                = Linear
+nstcomm                  = 1
+nstcalcenergy            = 1
+; Output frequency for energies to log file and energy file
+nstlog                   = 1
+nstenergy                = 1
+ns_type                  = grid
+cutoff-scheme            = verlet
+coulombtype              = PME
+nstlist                  = 10
+rlist                    = 1.2
+rcoulomb                 = 1.2
+rvdw                     = 1.2
+Tcoupl                   = no
+Pcoupl                   = no
+gen_vel                  = no
+nstxout                  = 1
+pbc                      = xyz
+
