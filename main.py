@@ -85,8 +85,11 @@ def gen_gro_box(lines):
 if __name__ == "__main__":
 
     #=================== Input name and creation of output folder  ===================
-    input_file='data.MOF_5_opt_2x2x2'
-    resname='UNL'
+    config=helper.setup_argparser()
+    args=config.parse_args()
+
+    input_file=args.datafile
+    resname=args.resname
 
     with open(input_file, 'r') as file:
         lines = file.readlines()
@@ -117,18 +120,31 @@ if __name__ == "__main__":
 
         if helper.check_duplicate_bond_types(bond_data):
             bond_data=dc.complete_bond_data(bond_data,bond_types_coeffs)
+    else:
+        bond_data=None
+        bond_types_coeffs=None
 
     if angle_count>0:
         angle_data=dc.angle_data(input_file,headers_dict,angle_count,atom_data)
         angle_coeffs,angle_types_coeffs,angle_style=dc.angle_coeffs(input_file, angle_data, headers_dict, types_dict['angle_types'])
+    else:
+        angle_data=None
+        angle_coeffs=None
+        angle_style=None
 
     if dihedral_count>0:
         dihedral_data=dc.dihedral_improper_data(input_file, headers_dict['Dihedrals'], dihedral_count, atom_data)
         dihedral_types_coeffs=dc.dihedral_coeffs(input_file, dihedral_data, headers_dict, types_dict['dihedral_types'])
+    else:
+        dihedral_data=None
+        dihedral_types_coeffs=None
 
     if improper_count>0:
         improper_data=dc.dihedral_improper_data(input_file, headers_dict['Impropers'], improper_count, atom_data)
         improper_types_coeffs=dc.improper_coeffs(input_file, improper_data, headers_dict, types_dict['improper_types'])
+    else:
+        improper_data=None
+        improper_types_coeffs=None
 
     #=================== Writing gromacs files ===================
     

@@ -204,8 +204,8 @@ def write_atomtypes(ff_types, atom_types, folder_name):
                     f"{ff_types['atomic_number'][i]:>10}"  # Right-aligned in 10 spaces
                     f"{ff_types['masses'][i]:>10.4f}"  # Right-aligned, 10 spaces, 4 decimals
                     f"  0.0000     A  "
-                    f"{ff_types['gro_sigma'][i]:>10.4f}"  # Right-aligned, 10 spaces, 4 decimals
-                    f"{ff_types['gro_epsilon'][i]:>10.4f}\n")  # Right-aligned, 10 spaces, 4 decimals
+                    f"{ff_types['gro_sigma'][i]:>20.8e}"  # Right-aligned, 20 spaces, 8 decimals
+                    f"{ff_types['gro_epsilon'][i]:>20.8e}\n")  # Right-aligned, 20 spaces, 8 decimals
             file.write(line)
 
 def write_gro_file(folder_name, atom_count, atom_data, resname,gro_box_str):

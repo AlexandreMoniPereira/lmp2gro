@@ -43,15 +43,21 @@ def bond_coeffs(input_file, bond_data, headers_dict, bond_types):
                              skiprows=headers_dict['Bond Coeffs'] + 2,
                              max_rows=bond_types)
     
+
+    if lammps_data.ndim == 1:        # single row (1D)
+        lammps_data = [lammps_data.tolist()]
+    else:                            # already 2D
+        lammps_data = lammps_data.tolist()
+
+    column_names = ['bond_type', 'kb_lammps', 'dist_lammps']
+
+    bond_coeffs_df = pd.DataFrame(lammps_data, columns=column_names[:len(lammps_data[0])])
+
     bond_types_coeffs = bond_data[['bond_type', 'element_i', 'element_j']].drop_duplicates() 
     bond_types_coeffs = bond_types_coeffs.sort_values(by='bond_type').reset_index(drop=True)
 
-    column_names=['bond_type','kb_lammps','dist_lammps']
-
-    bond_coeffs=pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
-
-    bond_types_coeffs['kb_gro']=bond_coeffs['kb_lammps']*4.184*100*2   
-    bond_types_coeffs['dist_gro']=bond_coeffs['dist_lammps']/10
+    bond_types_coeffs['kb_gro'] = bond_coeffs_df['kb_lammps'] * 4.184 * 100 * 2   
+    bond_types_coeffs['dist_gro'] = bond_coeffs_df['dist_lammps'] / 10
 
     return bond_types_coeffs
 

@@ -1,4 +1,6 @@
 import re
+import argparse
+import os
 
 
 def extract_numbers(text):
@@ -16,3 +18,21 @@ def check_duplicate_bond_types(bond_data):
 
     return len(bond_type_count)!=len(pair_bond_type_count)
 
+def setup_argparser():
+
+    """Set up the argument parser for command-line options."""
+
+    parser = argparse.ArgumentParser(description="Convert molecular data files into GROMACS format.",
+                                     formatter_class=argparse.RawDescriptionHelpFormatter,
+                                    epilog='''
+    Example usage:
+        python main.py datafile.data
+        python main.py datafile.data -r RESIDUE_NAME
+    ''')
+
+    parser.add_argument("datafile", type=str, help="Path to the input data file.")
+
+    parser.add_argument('-r', '--resname', type=str, default='UNL',
+                        help="Residue name to use in the output files (default: UNL).")
+    
+    return parser
