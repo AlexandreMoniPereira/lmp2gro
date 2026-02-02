@@ -9,10 +9,15 @@ def atom_data(input_file,headers_dict,atom_count,element_data,types_dict):
     lammps_data = np.loadtxt(input_file,
                          skiprows=headers_dict['Atoms'] + 2,
                          max_rows=atom_count)
-
-    column_names = ['atom_id', 'mol_id', 'atom_type', 'charge', 'x', 'y', 'z','vel_x','vel_y','vel_z']
-
-    atom_data = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
+    
+    if lammps_data.shape[1] == 6:
+        print('Your data file appears to be without charges.')
+        column_names = ['atom_id', 'mol_id', 'atom_type', 'x', 'y', 'z']
+        atom_data = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
+        atom_data['charge']=0
+    else:
+        column_names = ['atom_id', 'mol_id', 'atom_type', 'charge', 'x', 'y', 'z','vel_x','vel_y','vel_z']
+        atom_data = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
 
 
     ff_types = generate_ff(headers_dict, open(input_file).readlines(), element_data,types_dict)
@@ -21,6 +26,7 @@ def atom_data(input_file,headers_dict,atom_count,element_data,types_dict):
 
     atom_data['element'] = atom_data['atom_type'].map(element_mapping)
     atom_data['gro_type'] = atom_data['atom_type'].map(type_mapping)
+
     return atom_data,ff_types
 
 def bond_data(input_file,headers_dict,bond_count,atom_data):
@@ -131,7 +137,7 @@ def dihedral_improper_data(input_file, header_position, dihedral_count, atom_dat
     lammps_data = np.loadtxt(input_file,
                          skiprows=header_position + 2,
                          max_rows= dihedral_count)
-
+    
     column_names = ['dihedral_id', 'dihedral_type', 'ai', 'aj', 'ak','al']
 
     dihedral_data = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
@@ -148,24 +154,51 @@ def dihedral_coeffs(input_file, dihedral_data, headers_dict, dihedral_types):
                              skiprows=headers_dict['Dihedral Coeffs'] + 2,
                              max_rows=dihedral_types)
 
-    column_names=['dihedral_type','K_lammps','d_lammps','n_lammps']
-    dihedral_coeffs=pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
+    # Handle 1D array case (single dihedral type)
+    if lammps_data.ndim == 1:
+        lammps_data = lammps_data.reshape(1, -1)  # Convert to 2D array with 1 row
 
-    dihedral_coeffs['K_gromacs']=dihedral_coeffs['K_lammps']*4.184
-    dihedral_coeffs['phi_s_gromacs'] = np.where(dihedral_coeffs['d_lammps'] == 1, 0, 180)
-    dihedral_coeffs['n_gromacs'] = dihedral_coeffs['n_lammps']
+    if lammps_data.shape[1] == 4:
+        dihedral_style = "harmonic"    # gromacs harmonic, func=9
+        column_names = ['dihedral_type', 'K_lammps', 'd_lammps', 'n_lammps']
+        dihedral_coeffs = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
 
-    
-    dihedral_types_coeffs =  dihedral_data[['dihedral_type', 'element_i', 'element_j','element_k','element_l']].drop_duplicates()
-    dihedral_types_coeffs =  dihedral_types_coeffs.sort_values(by='dihedral_type').reset_index(drop=True)
+        dihedral_coeffs['K_gromacs'] = dihedral_coeffs['K_lammps'] * 4.184
+        dihedral_coeffs['phi_s_gromacs'] = np.where(dihedral_coeffs['d_lammps'] == 1, 0, 180)
+        dihedral_coeffs['n_gromacs'] = dihedral_coeffs['n_lammps']
 
-    dihedral_types_coeffs = dihedral_types_coeffs.merge(
-    dihedral_coeffs[['dihedral_type', 'K_gromacs', 'phi_s_gromacs', 'n_gromacs']],
-    on='dihedral_type',
-    how='left'  # Use 'left' to preserve existing rows in dihedral_types_coeffs
-    )
+        dihedral_types_coeffs = dihedral_data[['dihedral_type', 'element_i', 'element_j', 'element_k', 'element_l']].drop_duplicates()
+        dihedral_types_coeffs = dihedral_types_coeffs.sort_values(by='dihedral_type').reset_index(drop=True)
 
-    return dihedral_types_coeffs
+        dihedral_types_coeffs = dihedral_types_coeffs.merge(
+            dihedral_coeffs[['dihedral_type', 'K_gromacs', 'phi_s_gromacs', 'n_gromacs']],
+            on='dihedral_type',
+            how='left'
+        )
+
+    elif lammps_data.shape[1] == 5:
+        dihedral_style = 'opls'     # gromacs fourier, func=5
+        column_names = ['dihedral_type', 'C1_lammps', 'C2_lammps', 'C3_lammps', 'C4_lammps']
+        dihedral_coeffs = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
+
+        dihedral_coeffs['C1_gromacs'] = dihedral_coeffs['C1_lammps'] * 4.184
+        dihedral_coeffs['C2_gromacs'] = dihedral_coeffs['C2_lammps'] * 4.184
+        dihedral_coeffs['C3_gromacs'] = dihedral_coeffs['C3_lammps'] * 4.184
+        dihedral_coeffs['C4_gromacs'] = dihedral_coeffs['C4_lammps'] * 4.184
+
+        dihedral_types_coeffs = dihedral_data[['dihedral_type', 'element_i', 'element_j', 'element_k', 'element_l']].drop_duplicates()
+        dihedral_types_coeffs = dihedral_types_coeffs.sort_values(by='dihedral_type').reset_index(drop=True)
+
+        dihedral_types_coeffs = dihedral_types_coeffs.merge(
+            dihedral_coeffs[['dihedral_type', 'C1_gromacs', 'C2_gromacs', 'C3_gromacs', 'C4_gromacs']],
+            on='dihedral_type',
+            how='left'
+        )
+    else:
+        # Handle unexpected number of columns
+        raise ValueError(f"Unexpected number of columns in dihedral data: {lammps_data.shape[1]}")
+
+    return dihedral_types_coeffs, dihedral_style
 
 def improper_coeffs(input_file, improper_data, headers_dict, improper_types):
    
@@ -173,22 +206,31 @@ def improper_coeffs(input_file, improper_data, headers_dict, improper_types):
                              skiprows=headers_dict['Improper Coeffs'] + 2,
                              max_rows=improper_types)
 
-    if lammps_data.ndim == 1:        # single row (1D)
-        lammps_data = [lammps_data.tolist()]
+    # Handle 1D array case (single dihedral type)
+    if lammps_data.ndim == 1:
+        lammps_data = lammps_data.reshape(1, -1)  # Convert to 2D array with 1 row
 
-    column_names=['improper_type','k_lammps','C0_lammps','C1_lammps','C2_lammps','all']
-    try:
-        improper_coeffs=pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
-    except:
+
+    if lammps_data.shape[1] == 6:
+        improper_style="fourier"
+        column_names=['improper_type','k_lammps','C0_lammps','C1_lammps','C2_lammps','all']
         improper_coeffs=pd.DataFrame(lammps_data, columns=column_names)
 
-    improper_coeffs[['k_eff_lammps', 'theta0_deg']] =improper_coeffs.apply(
-    lambda row: fe.get_fourier_harmonic_params(K_fourier=row['k_lammps'],
-                                      C0=row['C0_lammps'],
-                                      C1=row['C1_lammps'],
-                                      C2=row['C2_lammps']), axis=1, result_type="expand")
+        improper_coeffs[['k_eff_lammps', 'theta0_deg']] =improper_coeffs.apply(
+        lambda row: fe.get_fourier_harmonic_params(K_fourier=row['k_lammps'],
+                                        C0=row['C0_lammps'],
+                                        C1=row['C1_lammps'],
+                                        C2=row['C2_lammps']), axis=1, result_type="expand")
+        
+        improper_coeffs['k_eff_gromacs']=improper_coeffs['k_eff_lammps']*4.184
+
     
-    improper_coeffs['k_eff_gromacs']=improper_coeffs['k_eff_lammps']*4.184
+    if lammps_data.shape[1] == 3:
+        improper_style='harmonic'
+        column_names=['improper_type','k_lammps','theta0_deg']
+        improper_coeffs=pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
+
+        improper_coeffs['k_eff_gromacs']=improper_coeffs['k_lammps']*4.184*2
 
     improper_types_coeffs =  improper_data[['dihedral_type', 'element_i', 'element_j','element_k','element_l']].drop_duplicates()
     improper_types_coeffs =  improper_types_coeffs.rename(columns={'dihedral_type':'improper_type'})
@@ -199,7 +241,7 @@ def improper_coeffs(input_file, improper_data, headers_dict, improper_types):
     on='improper_type',
     how='left'  # Use 'left' to preserve existing rows in improper_types_coeffs
     )
-    
+      
     return improper_types_coeffs
 
 def extract_box_params(lines):

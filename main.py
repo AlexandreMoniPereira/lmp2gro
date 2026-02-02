@@ -134,10 +134,10 @@ if __name__ == "__main__":
 
     if dihedral_count>0:
         dihedral_data=dc.dihedral_improper_data(input_file, headers_dict['Dihedrals'], dihedral_count, atom_data)
-        dihedral_types_coeffs=dc.dihedral_coeffs(input_file, dihedral_data, headers_dict, types_dict['dihedral_types'])
+        dihedral_types_coeffs,dihedral_style=dc.dihedral_coeffs(input_file, dihedral_data, headers_dict, types_dict['dihedral_types'])
     else:
         dihedral_data=None
-        dihedral_types_coeffs=None
+        dihedral_types_coeffs,dihedral_style=None,None
 
     if improper_count>0:
         improper_data=dc.dihedral_improper_data(input_file, headers_dict['Impropers'], improper_count, atom_data)
@@ -151,13 +151,13 @@ if __name__ == "__main__":
     dw.write_bonded_info(output_folder, types_dict, 
                          bond_count, bond_types_coeffs,
                          angle_count, angle_types_coeffs, angle_coeffs, angle_style,
-                         dihedral_count, dihedral_types_coeffs,
+                         dihedral_count, dihedral_types_coeffs, dihedral_style,
                          improper_count, improper_types_coeffs)
     
     dw.write_molecule_itp(output_folder, resname, atom_count, atom_data,
                        bond_count, bond_data,
                        angle_count, angle_data, angle_style,
-                       dihedral_count, dihedral_data,
+                       dihedral_count, dihedral_data, dihedral_style,
                        improper_count, improper_data)
     
     

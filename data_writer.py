@@ -3,7 +3,7 @@ import helper
 def write_bonded_info(folder_name, types_dict, 
                       bond_count, bond_types_coeffs,
                       angle_count, angle_types_coeffs, angle_coeffs, angle_style,
-                      dihedral_count, dihedral_types_coeffs,
+                      dihedral_count, dihedral_types_coeffs,dihedral_style,
                       improper_count, improper_types_coeffs):
     
     """
@@ -50,20 +50,37 @@ def write_bonded_info(folder_name, types_dict,
             file.write(line)
 
         if dihedral_count !=0:
-            file.write(f'''
+            if dihedral_style=='harmonic':
+                file.write(f'''
 [ dihedraltypes ]
 ;      i       j       k       l  func    phi_s               K        n
 ''')
-            for i in range(len(dihedral_types_coeffs)):
-                line = (f"{dihedral_types_coeffs['element_i'][i]:>8}"
-                        f"{dihedral_types_coeffs['element_j'][i]:>8}"
-                        f"{dihedral_types_coeffs['element_k'][i]:>8}"
-                        f"{dihedral_types_coeffs['element_l'][i]:>8}"
-                        f"     9 "
-                        f"{dihedral_types_coeffs['phi_s_gromacs'][i]:>8.1f}"
-                        f"{dihedral_types_coeffs['K_gromacs'][i]:>20.6f}"
-                        f"{dihedral_types_coeffs['n_gromacs'][i]:>5.0f}\n")
-                file.write(line)
+                for i in range(len(dihedral_types_coeffs)):
+                        line = (f"{dihedral_types_coeffs['element_i'][i]:>8}"
+                                f"{dihedral_types_coeffs['element_j'][i]:>8}"
+                                f"{dihedral_types_coeffs['element_k'][i]:>8}"
+                                f"{dihedral_types_coeffs['element_l'][i]:>8}"
+                                f"     9 "
+                                f"{dihedral_types_coeffs['phi_s_gromacs'][i]:>8.1f}"
+                                f"{dihedral_types_coeffs['K_gromacs'][i]:>20.6f}"
+                                f"{dihedral_types_coeffs['n_gromacs'][i]:>5.0f}\n")
+                        file.write(line)
+            if dihedral_style=='opls':
+                file.write(f'''
+[ dihedraltypes ]
+;      i       j       k       l  func    coefficients
+''')
+                for i in range(len(dihedral_types_coeffs)):
+                        line = (f"{dihedral_types_coeffs['element_i'][i]:>8}"
+                                f"{dihedral_types_coeffs['element_j'][i]:>8}"
+                                f"{dihedral_types_coeffs['element_k'][i]:>8}"
+                                f"{dihedral_types_coeffs['element_l'][i]:>8}"
+                                f"     5 "
+                                f"{dihedral_types_coeffs['C1_gromacs'][i]:>20.6f}"
+                                f"{dihedral_types_coeffs['C2_gromacs'][i]:>20.6f}"
+                                f"{dihedral_types_coeffs['C3_gromacs'][i]:>20.6f}"
+                                f"{dihedral_types_coeffs['C4_gromacs'][i]:>20.6f}\n")
+                        file.write(line)
             
         if improper_count !=0:
             file.write(f'''
@@ -84,7 +101,7 @@ def write_bonded_info(folder_name, types_dict,
 def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                        bond_count, bond_data,
                        angle_count, angle_data, angle_style,
-                       dihedral_count, dihedral_data,
+                       dihedral_count, dihedral_data,dihedral_style,
                        improper_count, improper_data):
     
     """Writes the molecule information to a GROMACS .itp file."""
@@ -159,6 +176,10 @@ def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                 file.write(line)
 
         if dihedral_count !=0:
+            if dihedral_style=='fourier':
+                dih_num=9
+            elif dihedral_style=='opls':
+                dih_num=5
             file.write(f'''
 [ dihedrals ]
 ;     ai      aj      ak      al   func  
@@ -169,7 +190,7 @@ def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                             f"{int(dihedral_data['aj'][i]):>8}"
                             f"{int(dihedral_data['ak'][i]):>8}"
                             f"{int(dihedral_data['al'][i]):>8}"
-                            f"     9 \n")
+                            f"     {dih_num} \n")
                     file.write(line)
 
         if improper_count !=0:        
