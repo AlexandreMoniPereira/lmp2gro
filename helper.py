@@ -26,8 +26,8 @@ def setup_argparser():
                                      formatter_class=argparse.RawDescriptionHelpFormatter,
                                     epilog='''
     Example usage:
-        python main.py datafile.data
-        python main.py datafile.data -r RESIDUE_NAME
+        python lmp2gro.py datafile.data
+        python lmp2gro.py datafile.data -r RESIDUE_NAME
     ''')
 
     parser.add_argument("datafile", type=str, help="Path to the input data file.")
