@@ -176,7 +176,7 @@ def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                 file.write(line)
 
         if dihedral_count !=0:
-            if dihedral_style=='fourier':
+            if dihedral_style=='harmonic':
                 dih_num=9
             elif dihedral_style=='opls':
                 dih_num=5
