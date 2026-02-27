@@ -1,9 +1,0 @@
-# ===== ENERGY MINIMIZATION - CONJUGATE GRADIENT =====
-min_style cg
-minimize 1.0e-6 1.0e-8 10000 10000
-neighbor 2.0 bin
-neigh_modify every 10 delay 0 check yes
-fix recenter all recenter NULL NULL NULL units box every 1
-thermo 10
-thermo_style custom step pe evdwl ecoul etotal fnorm
-# dump min_dump all custom 100 min.lammpstrj id type x y z  # Optional
