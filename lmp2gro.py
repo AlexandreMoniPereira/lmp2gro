@@ -98,11 +98,23 @@ if __name__ == "__main__":
 
     #=================== Extracting General Information ===================
     comment=lines[0]
-    atom_count=helper.extract_numbers(lines[2])[0]
-    bond_count=helper.extract_numbers(lines[3])[0]
-    angle_count=helper.extract_numbers(lines[4])[0]
-    dihedral_count=helper.extract_numbers(lines[5])[0]
-    improper_count=helper.extract_numbers(lines[6])[0]
+
+    count_titles={"atoms", "bonds", "angles", "dihedrals", "impropers"}
+    indices = {}
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+
+        for key in count_titles:
+            if stripped.endswith(key):
+                indices[key] = i
+                break
+
+    atom_count=helper.extract_numbers(lines[indices["atoms"]])[0]
+    bond_count=helper.extract_numbers(lines[indices["bonds"]])[0]
+    angle_count=helper.extract_numbers(lines[indices["angles"]])[0]
+    dihedral_count=helper.extract_numbers(lines[indices["dihedrals"]])[0]
+    improper_count=helper.extract_numbers(lines[indices["impropers"]])[0]
 
     types_dict=gen_types_dict(lines)
     headers_dict=gen_headers_dict(lines)
