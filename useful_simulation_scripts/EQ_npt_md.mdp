@@ -41,14 +41,14 @@ epsilon_surface          = 0         ; No vacuum-surface correction
 tcoupl                   = v-rescale ; Thermostat for NPT equilibration
 tc_grps                  = system    ; Thermostat group
 tau_t                    = 1.0       ; Thermostat time constant
-ref_t                    = 298       ; Reference temperature (K)
+ref_t                    = 430       ; Reference temperature (K)
 
 ; PRESSURE COUPLING - NPT EQUILIBRATION
 Pcoupl                   = Berendsen ; Barostat for equilibration
 Pcoupltype               = isotropic ; Isotropic pressure coupling
 tau_p                    = 1.0       ; Pressure relaxation time
 compressibility          = 4.5e-05   ; Water compressibility
-ref_p                    = 1.0       ; Reference pressure (bar)
+ref_p                    = 300       ; Reference pressure (bar)
 
 ; VELOCITY INITIALIZATION
 continuation             = yes       ; Continuing from NVT equilibration

@@ -1,0 +1,11 @@
+# ===== NPT PRODUCTION =====
+timestep 1.0
+neighbor 2.0 bin
+neigh_modify every 20 delay 0 check yes
+fix npt all npt temp 430.0 430.0 2000.0 iso 1.0 1.0 5000.0
+fix recenter all recenter NULL NULL NULL units box every 100
+fix shakes all shake 0.0001 20 0 b 0.4 1.0 a 1
+thermo 5000
+thermo_style custom step temp press density vol pe ke etotal
+dump npt_prod all custom 5000 npt_production.lammpstrj id type x y z
+run 100000000
