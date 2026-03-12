@@ -4,7 +4,7 @@ def write_bonded_info(folder_name, types_dict,
                       bond_count, bond_types_coeffs,
                       angle_count, angle_types_coeffs, angle_coeffs, angle_style,
                       dihedral_count, dihedral_types_coeffs,dihedral_style,
-                      improper_count, improper_types_coeffs):
+                      improper_count, improper_types_coeffs, improper_style):
     
     """
     Writes the bonded interaction parameters to a GROMACS .itp file.    
@@ -83,26 +83,43 @@ def write_bonded_info(folder_name, types_dict,
                         file.write(line)
             
         if improper_count !=0:
-            file.write(f'''
+            if improper_style=='harmonic' or improper_style=='fourier':
+                file.write(f'''
 [ dihedraltypes ]
 ;      i       j       k       l  func    thetha              K    
 ''')
-            for i in range(len(improper_types_coeffs)):
-                line = (f"{improper_types_coeffs['element_i'][i]:>8}"
-                        f"{improper_types_coeffs['element_j'][i]:>8}"
-                        f"{improper_types_coeffs['element_k'][i]:>8}"
-                        f"{improper_types_coeffs['element_l'][i]:>8}"
-                        f"     2 "
-                        f"{improper_types_coeffs['theta0_deg'][i]:>8.1f}"
-                        f"{improper_types_coeffs['k_eff_gromacs'][i]:>15.10f}\n")
-                file.write(line)
+                for i in range(len(improper_types_coeffs)):
+                        line = (f"{improper_types_coeffs['element_i'][i]:>8}"
+                                f"{improper_types_coeffs['element_j'][i]:>8}"
+                                f"{improper_types_coeffs['element_k'][i]:>8}"
+                                f"{improper_types_coeffs['element_l'][i]:>8}"
+                                f"     2 "
+                                f"{improper_types_coeffs['theta0_deg'][i]:>8.1f}"
+                                f"{improper_types_coeffs['k_eff_gromacs'][i]:>15.10f}\n")
+                        file.write(line)
+            if improper_style=='cvff':
+                file.write(f'''
+[ dihedraltypes ]
+;      i       j       k       l  func    phi_s               K        n
+''')
+                for i in range(len(improper_types_coeffs)):
+                        line = (f"{improper_types_coeffs['element_i'][i]:>8}"
+                                f"{improper_types_coeffs['element_j'][i]:>8}"
+                                f"{improper_types_coeffs['element_k'][i]:>8}"
+                                f"{improper_types_coeffs['element_l'][i]:>8}"
+                                f"     9 "
+                                f"{improper_types_coeffs['phi_s_gromacs'][i]:>8.1f}"
+                                f"{improper_types_coeffs['K_gromacs'][i]:>20.6f}"
+                                f"{improper_types_coeffs['n_gromacs'][i]:>5.0f}\n")
+                        file.write(line)
+                
 
 
 def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                        bond_count, bond_data,
                        angle_count, angle_data, angle_style,
                        dihedral_count, dihedral_data,dihedral_style,
-                       improper_count, improper_data):
+                       improper_count, improper_data, improper_style):
     
     """Writes the molecule information to a GROMACS .itp file."""
        
@@ -193,7 +210,11 @@ def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                             f"     {dih_num} \n")
                     file.write(line)
 
-        if improper_count !=0:        
+        if improper_count !=0:
+            if improper_style=='harmonic' or improper_style=='fourier':
+                        imp_num=2
+            elif improper_style=='cvff':
+                        imp_num=9        
             file.write(f'''
 [ dihedrals ]
 ;     ai      aj      ak      al   func  
@@ -204,7 +225,7 @@ def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                             f"{int(improper_data['aj'][i]):>8}"
                             f"{int(improper_data['ak'][i]):>8}"
                             f"{int(improper_data['al'][i]):>8}"
-                            f"     2 \n")
+                            f"     {imp_num} \n")
                     file.write(line)
 
 

@@ -163,9 +163,15 @@ def dihedral_coeffs(input_file, dihedral_data, headers_dict, dihedral_types):
         column_names = ['dihedral_type', 'K_lammps', 'd_lammps', 'n_lammps']
         dihedral_coeffs = pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
 
-        dihedral_coeffs['K_gromacs'] = dihedral_coeffs['K_lammps'] * 4.184
-        dihedral_coeffs['phi_s_gromacs'] = np.where(dihedral_coeffs['d_lammps'] == 1, 0, 180)
-        dihedral_coeffs['n_gromacs'] = dihedral_coeffs['n_lammps']
+        dihedral_coeffs[['K_gromacs', 'phi_s_gromacs', 'n_gromacs']] = dihedral_coeffs.apply(
+            lambda row: fe.get_harmonic_dihedral_params(
+                K_lammps=row['K_lammps'],
+                d_lammps=row['d_lammps'],
+                n_lammps=row['n_lammps']
+            ),
+            axis=1,
+            result_type="expand"
+        )
 
         dihedral_types_coeffs = dihedral_data[['dihedral_type', 'element_i', 'element_j', 'element_k', 'element_l']].drop_duplicates()
         dihedral_types_coeffs = dihedral_types_coeffs.sort_values(by='dihedral_type').reset_index(drop=True)
@@ -224,6 +230,24 @@ def improper_coeffs(input_file, improper_data, headers_dict, improper_types):
         
         improper_coeffs['k_eff_gromacs']=improper_coeffs['k_eff_lammps']*4.184
 
+    if lammps_data.shape[1] == 4:
+        improper_style="cvff_harmonic"
+        column_names=['improper_type','k_lammps','d_lammps','n_lammps']
+        improper_coeffs=pd.DataFrame(lammps_data, columns=column_names[:lammps_data.shape[1]])
+
+        improper_coeffs[['K_gromacs', 'phi_s_gromacs', 'n_gromacs']] = improper_coeffs.apply(
+            lambda row: fe.get_harmonic_dihedral_params(K_lammps=row['k_lammps'],
+                                          d_lammps=row['d_lammps'],
+                                          n_lammps=row['n_lammps']), axis=1, result_type="expand")
+        
+        improper_types_coeffs =  improper_data[['improper_type', 'element_i', 'element_j', 'element_k', 'element_l']].drop_duplicates()
+        improper_types_coeffs = improper_types_coeffs.sort_values(by='improper_type').reset_index(drop=True)
+
+        improper_types_coeffs = improper_types_coeffs.merge(
+            improper_coeffs[['improper_type', 'K_gromacs', 'phi_s_gromacs', 'n_gromacs']],
+            on='improper_type',
+            how='left'
+        )
     
     if lammps_data.shape[1] == 3:
         improper_style='harmonic'
@@ -242,7 +266,7 @@ def improper_coeffs(input_file, improper_data, headers_dict, improper_types):
     how='left'  # Use 'left' to preserve existing rows in improper_types_coeffs
     )
       
-    return improper_types_coeffs
+    return improper_types_coeffs,improper_style
 
 def extract_box_params(lines):
     xy, xz, yz = 0,0,0

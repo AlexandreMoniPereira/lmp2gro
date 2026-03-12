@@ -3,8 +3,7 @@ import pandas as pd
 import numpy as np
 import math
 
-
-#=============================== LAMMPS cossine-periodic to gromacs harmonic ===============================
+#=============================== LAMMPS cossine-periodic to gromacs harmonic - not recommended ===============================
 def get_lammps_cos_per_params(C, B, n):                    
     theta = np.linspace(0, 2 * np.pi, 1000)
     theta_angle = theta * 180 / np.pi
@@ -42,7 +41,8 @@ def get_lammps_cos_per_params(C, B, n):
     return optimal_keff, theta0
 
 
-#=============================== LAMMPS fourier to gromacs gromos style ===============================
+#=============================== LAMMPS fourier to gromacs gromos style - better ===============================
+
 def get_fourier_gromos_params(K, C0, C1, C2):
     theta = np.linspace(0, 2 * np.pi, 1000)
     theta_angle = theta * 180 / np.pi
@@ -130,3 +130,13 @@ def get_fourier_harmonic_params(K_fourier, C0, C1, C2):
     k_opt = float(result.x[0])  # already in kJ/mol/rad²
 
     return k_opt, theta0
+
+#=============================== LAMMPS harmonic dihedral to gromacs harmonic dihedral ("periodic type" function 9) ===============================
+#=============================== Also works for LAMMPS cvff improper to gromacs harmonic dihedral                   ===============================
+def get_harmonic_dihedral_params(K_lammps,d_lammps,n_lammps):
+    
+    K_gromacs = K_lammps * 4.184  # Convert from kcal/mol to kJ/mol
+    phi_s_gromacs = 0 if d_lammps == 1 else 180  # Phase shift based on periodicity
+    n_gromacs = n_lammps  # Periodicity remains the same
+
+    return K_gromacs, phi_s_gromacs, n_gromacs

@@ -28,11 +28,28 @@ def setup_argparser():
     Example usage:
         python lmp2gro.py datafile.data
         python lmp2gro.py datafile.data -r RESIDUE_NAME
+        python lmp2gro.py datafile.data --clean -a "1 2 3" -b "1 2" -d "1" -i "1 2"
+        python lmp2gro.py datafile.data --clean (removes all types with zero coefficients)
     ''')
 
-    parser.add_argument("datafile", type=str, help="Path to the input data file.")
+    parser.add_argument('datafile', type=str, help="Path to the input data file.")
 
     parser.add_argument('-r', '--resname', type=str, default='UNL',
                         help="Residue name to use in the output files (default: UNL).")
     
+    parser.add_argument('--clean', action='store_true',
+                        help="Clean data by removing specified types in (-b for bonds, -a for angles, -d for dihedrals, and -i for impropers). If no specific types are provided, it will remove all types with zero coefficients.")
+
+    parser.add_argument('-b', '--bond_rm', type=str, default='',
+                        help="Requires --clean. String of bond type indices to remove (e.g., '1 2 3'). If empty, it will remove all bond types with zero coefficients.")
+
+    parser.add_argument('-a', '--angle_rm', type=str, default='',
+                        help="Requires --clean. String of angle type indices to remove (e.g., '1 2 3'). If empty, it will remove all angle types with zero coefficients.")
+    
+    parser.add_argument('-d', '--dihedral_rm', type=str, default='',
+                        help="Requires --clean. String of dihedral type indices to remove (e.g., '1 2 3'). If empty, it will remove all dihedral types with zero coefficients.")
+    
+    parser.add_argument('-i', '--improper_rm', type=str, default='',
+                        help="Requires --clean. String of improper type indices to remove (e.g., '1 2 3'). If empty, it will remove all improper types with zero coefficients.")                        
+
     return parser
