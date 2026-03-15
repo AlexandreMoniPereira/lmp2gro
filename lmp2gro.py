@@ -68,11 +68,18 @@ if __name__ == "__main__":
     angle_rm_str=args.angle_rm
     dihedral_rm_str=args.dihedral_rm
     improper_rm_str=args.improper_rm
+    output_folder = args.folder
 
     with open(input_file, 'r') as file:
         lines = file.readlines()
 
-    output_folder = create_output_folder(input_file)
+    if output_folder is None:
+        output_folder = create_output_folder(input_file)
+    else:
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+        else:
+            print(f"Warning: Output folder '{output_folder}' already exists. Files may be overwritten.")
 
     #=================== Extracting General Information ===================
     comment=lines[0]
@@ -111,6 +118,9 @@ if __name__ == "__main__":
 
         if helper.check_duplicate_bond_types(bond_data):
             bond_data=dc.complete_bond_data(bond_data,bond_types_coeffs)
+
+        if clean ==True:
+            bond_types_coeffs, bond_coeffs, bond_data, bond_count, types_dict['bond_types'] = dcl.clean_bond_data(bond_types_coeffs, bond_types_coeffs, bond_data, bond_rm_str, bond_count, types_dict['bond_types'])
     else:
         bond_data=None
         bond_types_coeffs=None
@@ -130,6 +140,8 @@ if __name__ == "__main__":
     if dihedral_count>0:
         dihedral_data=dc.dihedral_improper_data(input_file, headers_dict['Dihedrals'], dihedral_count, atom_data)
         dihedral_types_coeffs,dihedral_style=dc.dihedral_coeffs(input_file, dihedral_data, headers_dict, types_dict['dihedral_types'])
+        if clean ==True:
+            dihedral_types_coeffs, dihedral_data, dihedral_count, types_dict['dihedral_types'] = dcl.clean_dihedral_data(dihedral_types_coeffs, dihedral_data, dihedral_rm_str, dihedral_count, types_dict['dihedral_types'])
     else:
         dihedral_data=None
         dihedral_types_coeffs=None
@@ -138,6 +150,9 @@ if __name__ == "__main__":
     if improper_count>0:
         improper_data=dc.dihedral_improper_data(input_file, headers_dict['Impropers'], improper_count, atom_data)
         improper_types_coeffs,improper_style=dc.improper_coeffs(input_file, improper_data, headers_dict, types_dict['improper_types'])
+        if clean ==True:
+            improper_types_coeffs, improper_data, improper_count, types_dict['improper_types'] = dcl.clean_improper_data(improper_types_coeffs,  improper_data, improper_rm_str, improper_count, types_dict['improper_types'])
+    
     else:
         improper_data=None
         improper_types_coeffs=None

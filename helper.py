@@ -28,7 +28,8 @@ def setup_argparser():
     Example usage:
         python lmp2gro.py datafile.data
         python lmp2gro.py datafile.data -r RESIDUE_NAME
-        python lmp2gro.py datafile.data --clean -a "1 2 3" -b "1 2" -d "1" -i "1 2"
+        python lmp2gro.py datafile.data -r RESIDUE_NAME --folder output_folder
+        python lmp2gro.py datafile.data --clean -b "1 2" -a "1 2 3" -d "1" -i "1 2"
         python lmp2gro.py datafile.data --clean (removes all types with zero coefficients)
     ''')
 
@@ -52,4 +53,7 @@ def setup_argparser():
     parser.add_argument('-i', '--improper_rm', type=str, default='',
                         help="Requires --clean. String of improper type indices to remove (e.g., '1 2 3'). If empty, it will remove all improper types with zero coefficients.")                        
 
+    parser.add_argument('--folder', type=str, default=None,
+                        help="Optional name for the output folder.") 
+    
     return parser
