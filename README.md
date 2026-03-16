@@ -4,9 +4,9 @@
  - Alexandre Moni Pereira
 
 ## Motivation
-**lmp2gro** is a Python-based utility designed to facilitate the topological conversion of [Large-scale Atomic/Molecular Massively Parallel Simulator (LAMMPS)](https://www.lammps.org/#gsc.tab=0) data files into GROMACS-compatible formats.
+**lmp2gro** is a Python-based utility designed to facilitate the topological conversion of [Large-scale Atomic/Molecular Massively Parallel Simulator (LAMMPS)](https://www.lammps.org/#gsc.tab=0) data files into [GROMACS](https://www.gromacs.org/)-compatible formats.
 
-While LAMMPS provides several internal tools for topology generation (such as `msi2lmp`, `amber2lmp`, and `ch2lmp`) and supports external utilities like `cif2lammps`, transitioning these models to [GROMACS](https://www.gromacs.org/) remains a challenge. Given that these tools are highly effective for generating complex topologies—particularly for systems where GROMACS-native builders may struggle—a robust conversion bridge is essential for inter-software interoperability.
+While LAMMPS provides several internal tools for topology generation (such as `msi2lmp`, `amber2lmp`, and `ch2lmp`) and supports external utilities like `cif2lammps`, transitioning these models to GROMACS remains a challenge. Given that these tools are highly effective for generating complex topologies—particularly for systems where GROMACS-native builders may struggle—a robust conversion bridge is essential for inter-software interoperability.
 
 ## Current Status
 Initially developed for the characterization of crystals, surfaces, and Metal-Organic Frameworks (MOFs), **lmp2gro** processes a single-molecule LAMMPS data file to generate the necessary GROMACS input files. The current implementation outputs a single residue name (`resname`), allowing for the subsequent integration of additional molecular species within the GROMACS environment.
