@@ -1,0 +1,20 @@
+; Topology generated using OBGMX.
+;
+; Please cite:
+; G. Garberoglio. OBGMX: A web-based generator of GROMACS topologies for
+; molecular and periodic systems using the Universal Force Field.
+; J. Comput. Chem. 33 (2012), 2204-2208. doi: 10.1002/jcc.23049
+
+[ moleculetype ]
+; Name       nrexcl
+HYD    3
+
+[ atoms ]
+; nr type  resnr    residue    atom     cgnr    charge       mass 
+1          H_       1   HYD     H_       1     0.0000     1.0079
+2          H_       1   HYD     H_       2     0.0000     1.0079
+
+[ bonds ]
+1      2       1     0.0708  397181.4792 
+
+
