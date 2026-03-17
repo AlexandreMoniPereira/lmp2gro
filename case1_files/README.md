@@ -4,6 +4,7 @@ This tutorial provides a step-by-step guide for converting and simulating MOF-5.
 
 - This README guide.
 - LAMMPS data files for MOF-5 (neutral and charged variants).
+- Necessary Hydrogen topology (.itp) files
 - GROMACS parameter files (.mdp) for energy minimization and NPT ensembles.
 
 ---
