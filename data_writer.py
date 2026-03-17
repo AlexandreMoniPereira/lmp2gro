@@ -143,8 +143,8 @@ def write_molecule_itp(folder_name, resname, atom_count, atom_data,
                         f"     1 "
                         f"{resname:<5}"
                         f"{atom_data['element'][i].replace(' ',''):>5}"
-                        f"{int(atom_data['atom_id'][i]):<5}"
-                        f"{int(atom_data['atom_id'][i]):>5}"
+                        f"{int(atom_data['atom_id'][i]):<10}"
+                        f"{int(atom_data['atom_id'][i]):>10}"
                         f"{atom_data['charge'][i]:>15.6f}\n")
                 file.write(line)
         
@@ -281,7 +281,10 @@ def write_topology(folder_name,resname):
 ;
 [ defaults ]
 ; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
-  1             3               yes              1.0     0.0
+;Only one of the following parameter sets should be used. Comment the other one with ";"
+
+  1             3               yes              1.0     0.0   ; UFF style (used in Case 1)
+  1             3               yes              1.0     1.0   ; Interface FF style (used in Case 2)
 
 ; The force field files to be included
 #include "atomtypes.itp"

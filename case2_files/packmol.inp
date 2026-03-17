@@ -1,0 +1,11 @@
+
+tolerance 2.0
+filetype pdb
+output water_box.pdb
+
+structure water2005.pdb 
+  number 1300 
+  inside box 100.1 0. 30.5 133.4 34.6 65.1 
+end structure
+
+

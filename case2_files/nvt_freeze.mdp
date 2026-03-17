@@ -1,0 +1,58 @@
+; RUN CONTROL
+integrator               = md        ; Leap-frog algorithm
+tinit                    = 0         ; Starting time (ps)
+dt                       = 0.001     ; Time step (ps) - 1 fs
+nsteps                   = 20000000  ; Total steps = 20 ns
+nstcomm                  = 100       ; COM removal frequency
+
+; OUTPUT CONTROL
+nstxout                  = 0         ; No full precision trajectory
+nstvout                  = 0         ; No velocity output
+nstfout                  = 0         ; No force output
+nstlog                   = 500       ; Log output every 0.5 ps
+nstenergy                = 500       ; Energy output every 0.5 ps
+nstxout-compressed       = 500       ; Compressed trajectory every 0.5 ps
+
+; NEIGHBOR SEARCHING
+cutoff-scheme            = verlet    ; Verlet buffer scheme
+nstlist                  = 20        ; Neighbor list update frequency
+ns_type                  = grid      ; Grid-based neighbor searching
+pbc                      = xyz       ; 3D periodic boundary conditions
+rlist                    = 1.2       ; Neighbor list cutoff (nm)
+
+; ELECTROSTATICS
+coulombtype              = cutoff    
+rcoulomb                 = 1.2       ; Real space cutoff (nm)
+
+; VAN DER WAALS
+vdwtype                  = cutoff    ; Cut-off for VdW
+vdw-modifier             = potential-switch  ; Switch function
+rvdw-switch              = 1.0       ; Switch start distance (nm)
+rvdw                     = 1.2       ; VdW cutoff (nm)
+DispCorr                 = EnerPres  ; Long-range dispersion corrections
+
+; PME PARAMETERS
+;fourierspacing           = 0.12      ; Grid spacing for FFT (nm)
+;pme_order                = 4         ; B-spline interpolation order
+;ewald_rtol               = 1e-06     ; Relative tolerance for Ewald
+;epsilon_surface          = 0         ; No vacuum-surface correction
+
+; TEMPERATURE COUPLING
+tcoupl                   = v-rescale ; Thermostat for NPT equilibration
+tc_grps                  = system    ; Thermostat group
+tau_t                    = 1.0       ; Thermostat time constant
+ref_t                    = 298       ; Reference temperature (K)
+
+; VELOCITY INITIALIZATION
+continuation             = no       
+gen_vel                  = yes      
+gen_temp                 = 298
+; CONSTRAINT ALGORITHM
+constraints              = h-bonds   ; Constrain bonds involving hydrogen
+constraint-algorithm     = lincs     ; LINCS constraint algorithm
+lincs-order              = 4         ; Expansion order for constraint coupling matrix
+lincs-iter               = 1         ; Number of iterations for LINCS
+lincs-warnangle          = 30        ; Warning threshold for bond rotation
+freezegrps               = bottom_part
+freezedim                = Y Y Y
+

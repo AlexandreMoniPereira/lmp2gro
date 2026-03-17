@@ -1,0 +1,10 @@
+TITLE     tip4p.gro
+REMARK    THIS IS A SIMULATION BOX
+CRYST1   10.000   10.000   10.000  90.00  90.00  90.00 P 1           1
+MODEL        1
+ATOM      1  OW  SOL     1      17.360   8.390   2.570  1.00  0.00            
+ATOM      2  HW1 SOL     1      17.770   7.810   3.220  1.00  0.00            
+ATOM      3  HW2 SOL     1      16.430   8.310   2.740  1.00  0.00            
+ATOM      4  MW  SOL     1      17.300   8.310   2.670  1.00  0.00            
+TER
+ENDMDL

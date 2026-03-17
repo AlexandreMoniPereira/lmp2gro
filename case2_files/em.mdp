@@ -1,0 +1,33 @@
+; ENERGY MINIMIZATION USING STEEPEST DESCENT
+integrator               = steep   ; Steepest descent algorithm for energy minimization
+nsteps                   = 10000   ; Maximum number of minimization steps
+
+; CONSTRAINT SETTINGS
+constraints              = none    ; No constraints during energy minimization
+
+; MINIMIZATION CONVERGENCE
+emtol                    = 20      ; Convergence tolerance - max force < 20 kJ/mol/nm
+emstep                   = 0.01    ; Initial step size for minimization (nm)
+
+; CENTER OF MASS MOTION
+comm-mode                = Linear  ; Linear center of mass motion removal
+
+; OUTPUT CONTROL
+nstcalcenergy            = 1       ; Calculate energy every step
+nstlog                   = 1       ; Write to log file every step (consider increasing to reduce file size)
+nstenergy                = 1       ; Write energy to .edr file every step
+nstxout                  = 1       ; Write coordinates every step (creates large .trr files)
+
+; NEIGHBOR SEARCHING
+ns_type                  = grid    ; Efficient grid-based neighbor searching
+cutoff-scheme            = verlet  ; Modern Verlet cutoff scheme
+nstlist                  = 10      ; Update neighbor list every 10 steps
+rlist                    = 1.2     ; Neighbor list cutoff radius (nm)
+
+; FORCE FIELD CUTOFFS
+coulombtype              = PME     ; Particle Mesh Ewald for long-range electrostatics
+rcoulomb                 = 1.2     ; Short-range electrostatic cutoff (nm)
+rvdw                     = 1.2     ; Van der Waals cutoff radius (nm)
+
+; PERIODIC BOUNDARY CONDITIONS
+pbc                      = xyz     ; Periodic boundaries in all directions

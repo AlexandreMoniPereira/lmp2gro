@@ -1,0 +1,20 @@
+units			real	                             
+atom_style		full                              
+boundary                p p p                               
+
+pair_style	    lj/cut/coul/long 10.0 10.0           
+pair_modify         tail no mix arithmetic			     
+bond_style	    harmonic   			                 
+angle_style	    harmonic			                
+dihedral_style      harmonic
+improper_style      cvff
+
+
+read_data	silica_Q4_0_0OH.data
+kspace_style	pppm 1.0e-4     
+
+
+replicate        7 1 1 bond/periodic
+#replicate       1 6 1 bond/periodic     # Replicate in one direction at a time to avoid change index order.
+
+write_data      replicated_Q4.data
