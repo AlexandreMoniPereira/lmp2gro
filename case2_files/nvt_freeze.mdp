@@ -21,7 +21,7 @@ pbc                      = xyz       ; 3D periodic boundary conditions
 rlist                    = 1.2       ; Neighbor list cutoff (nm)
 
 ; ELECTROSTATICS
-coulombtype              = cutoff    
+coulombtype              = PME       ; Particle Mesh Ewald
 rcoulomb                 = 1.2       ; Real space cutoff (nm)
 
 ; VAN DER WAALS
