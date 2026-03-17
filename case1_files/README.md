@@ -51,7 +51,7 @@ Copy `em.mdp` from `case1_files` into your current directory. Generate the binar
 ```bash
 gmx grompp -f em.mdp -c conf.gro -p topol.top -o em.tpr -maxwarn 3
 ```
-*Note: The `-maxwarn 3` flag is used to bypass warmless warnings.*
+*Note: The `-maxwarn 3` flag is used to bypass harmless warnings.*
 
 Run the minimization using `mdrun`:
 
