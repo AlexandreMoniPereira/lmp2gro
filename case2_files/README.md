@@ -127,24 +127,45 @@ There is a final version of `qtz_water.gro` inside the `case2_files` directory, 
 
 ## Step 5 - Index Generation and Constraints
 
-We need to freeze the bottom part of the quartz surface to maintain the structural integrity of the substrate.
+To maintain the structural integrity of the substrate and prevent the surface from drifting, we must freeze the bottom layer of the quartz. This requires creating a specific index group.
 
-1. **Generate the Base Index:**
+1. **Generate a Reference TPR:**
+To use selection tools, we first need a binary topology file (.tpr). Run `grompp` using your initial configuration:
+
 ```bash
-gmx make_ndx -f em_out.gro -o index.ndx
+gmx grompp -f em.mdp -c qtz_water.gro -p topol.top -o initial.tpr -maxwarn 3
 ```
 
-2. **Select Bottom Atoms:** Identify atoms with Z-coordinates < 1 nm:
+2. **Generate the Base Index File:**
+Create a standard index file containing the default groups (System, Quartz, Water, etc.):
+
+```bash
+gmx make_ndx -f initial.tpr -o index.ndx
+```
+*(Type 'q' to save and exit).*
+
+3. **Select the Bottom Atoms (Z < 1 nm):**
+Use the `gmx select` tool to identify all atoms in the lower 1 nm of the box. This creates a temporary index file:
+
 ```bash
 gmx select -f qtz_water.gro -s initial.tpr -select 'z < 1' -on bottom_part.ndx
 ```
 
-3. **Merge Indexes:**
+4. **Merge and Rename the Groups:**
+Now, merge the new selection into your main index file and rename it for clarity.
+
+*On Linux:*
 ```bash
-cat index.ndx bottom_part.ndx > final_index.ndx && mv final_index.ndx index.ndx
+cat index.ndx bottom_part.ndx > final_index.ndx
 ```
 
-4. **Rename Group:** Run `gmx make_ndx -f em_out.gro -n index.ndx`, type `name 4 bottom_part` (or whichever index corresponds to your selection), and press `q` to save.
+Then, open the index with `make_ndx` to finalize the naming:
+```bash
+gmx make_ndx -f initial.tpr -n final_index.ndx
+```
+* In the `make_ndx` prompt, identify the number of the newly added group (usually at the end).
+* Type `name X bottom_part` (replace `X` with the group number).
+* Type `q` to save as `index.ndx`.
 
 ## Step 6 - Constrained Energy Minimization
 
