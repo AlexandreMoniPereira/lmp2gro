@@ -42,7 +42,7 @@ The input file (`data.lammps_data_file`) must contain a single molecular entity,
     The resulting directory will contain a structural file (`conf.gro`), global force field parameters (`topol.top`, `ffbonded.itp`, `atomtypes.itp`), and a molecule-specific inclusion file (`conf.itp`).
 
 ### Parameter Refinement
-In specific force fields like **CLAY-FF**, where interactions are predominantly non-bonded, automatically generated bonded terms may be physically redundant. The `--clean` function identifies and removes harmonic bonded parameters where force constants and equilibrium values are zero.
+In specific force fields like **CLAY-FF**, where interactions are predominantly non-bonded, automatically generated bonded terms may be physically redundant. The `--clean` function identifies and removes bonded parameters for which all values are zero.
 
 ```bash
 python3 lmp2gro.py data.lammps_data_file -r RES --folder folder_name --clean
