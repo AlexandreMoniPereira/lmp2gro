@@ -18,6 +18,7 @@ cutoff-scheme            = verlet    ; Verlet buffer scheme
 nstlist                  = 20        ; Neighbor list update frequency
 ns_type                  = grid      ; Grid-based neighbor searching
 pbc                      = xyz       ; 3D periodic boundary conditions
+periodic-molecules       = yes       ; Molecule parameters are across pbc conditions
 rlist                    = 1.2       ; Neighbor list cutoff (nm)
 
 ; ELECTROSTATICS
