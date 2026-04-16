@@ -32,3 +32,4 @@ rvdw                     = 1.2     ; Van der Waals cutoff radius (nm)
 
 ; PERIODIC BOUNDARY CONDITIONS
 pbc                      = xyz     ; Periodic boundaries in all directions
+periodic-molecules       = yes     ; Molecule parameters are across pbc conditions
