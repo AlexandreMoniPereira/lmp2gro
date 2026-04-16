@@ -1,6 +1,6 @@
 # Case 2 Tutorial: Water Droplet on a Silica Q4 Surface 
 
-This tutorial provides a step-by-step guide for converting and simulating a Silica Q4 surface using [INTERFACE-FF](https://bionanostructures.com/interface-md/). The necessary files are located in the `case2_files` folder:
+This tutorial provides a step-by-step guide for converting and simulating a Silica Q4 surface using [INTERFACE-FF](https://bionanostructures.com/interface-md/). The current folder (`case2_files`) contains these necessary files:
 - This README guide.
 - LAMMPS data files for Silica Q4 and a LAMMPS input script to replicate the cell.
 - TIP4P/2005 water parameter files.
@@ -19,7 +19,7 @@ Download the INTERFACE folder from the [official website](https://bionanostructu
 
 You will also need the `msi2lmp` executable. You can find it in the `UTILITY_PROGRAMS` folder of INTERFACE-FF or the `tools/msi2lmp` directory of the [LAMMPS source](https://www.lammps.org/download.html). On Linux, compile it by running `make` inside the `src` folder.
 
-Once you have the executable and the files in the same directory, run:
+Once you have the `msi2lmp` executable and the INTERFACE files in the same directory, run:
 
 ```bash
 ./msi2lmp.exe silica_Q4_0_0OH -class I -f ./cvff_interface_v1_5.frc
