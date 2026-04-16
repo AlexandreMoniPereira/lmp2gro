@@ -1,6 +1,6 @@
 # Case 1 Tutorial: MOF-5 Conversion and Simulation
 
-This tutorial provides a step-by-step guide for converting and simulating MOF-5. The necessary files are located in the `case1_files` folder:
+This tutorial provides a step-by-step guide for converting and simulating MOF-5. The current (`case1_files`) folder contains these necessary files:
 
 - This README guide.
 - LAMMPS data files for MOF-5 (neutral and charged variants).
