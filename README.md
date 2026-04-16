@@ -18,8 +18,6 @@ The script has been validated using topologies generated via `msi2lmp` for the *
 - `pandas`
 - `numpy`
 - `scipy`
-- `os`
-- `re`
 
 ## Usage
 The primary execution syntax is:
@@ -58,4 +56,5 @@ python3 lmp2gro.py data.lammps_data_file -r RES --folder folder_name --clean -b 
 * `-a`: Indices for **angles** to be deleted.
 * `-d`: Indices for **dihedrals** to be deleted.
 * `-i`: Indices for **impropers** to be deleted.
+*  The numbers represent the indexes to be removed from the LAMMPS data file.
 
