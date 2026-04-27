@@ -1,7 +1,5 @@
 
-<img src="lmp2gro_logo.png" align="right" width="240">
-
-<br>
+<img src="lmp2gro_logo.png" align="right" width="200">
 
 # lmp2gro
 
