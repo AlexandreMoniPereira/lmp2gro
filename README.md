@@ -1,8 +1,9 @@
 
 <img src="lmp2gro_logo.png" align="right" width="240">
 
-# lmp2gro
 <br>
+
+# lmp2gro
 
 ## Author
  - Alexandre Moni Pereira
