@@ -1,3 +1,5 @@
+
+<img src="lmp2gro_logo.png" align="right" width="120">
 # lmp2gro
 
 ## Author
