@@ -32,7 +32,7 @@ To install, we recommend creating a dedicated environment:
 
 ```bash
 # Create the environment
-conda create -n lmp2gro_env python>=3.7
+conda create -n lmp2gro_env python=3.10
 
 # Activate the environment
 conda activate lmp2gro_env
