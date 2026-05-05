@@ -22,6 +22,31 @@ The script has been validated using topologies generated via `msi2lmp` for the *
 - `numpy`
 - `scipy`
 
+## lmp2gro installation using pip
+
+Alternatively to download the repository, one can install **lmp2gro** directly using pip. The primary advantage is that you no longer need to call the Python interpreter explicitly, as the tool can be executed from any directory.
+
+Commands that previously began with `python3 lmp2gro.py` will now be replaced simply by `lmp2gro`.
+
+To install, we recommend creating a dedicated environment:
+
+```bash
+# Create the environment
+conda create -n lmp2gro_env python>=3.7
+
+# Activate the environment
+conda activate lmp2gro_env
+
+# Install the package
+pip install lmp2gro
+```
+
+To verify the installation and view available options:
+
+```bash
+lmp2gro -h
+```
+
 ## Usage
 The primary execution syntax is:
 
