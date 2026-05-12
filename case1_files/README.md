@@ -108,3 +108,10 @@ gmx insert-molecules -f conf.gro -ci HYD.gro -nmol 10 -o conf.gro
 
 ### 4.3 Execution
 Repeat **Step 2** and **Step 3** using the updated `conf.gro` file to perform the guest-host simulation.
+
+## Simulation Results
+Here is a trajectory animation of the NVT production run:
+
+<p align="center">
+  <img src="traj_mof5_H.gif" width="400" alt="Molecular Dynamics Trajectory Demo">
+</p>
