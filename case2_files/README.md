@@ -184,3 +184,10 @@ Finally, run the NVT simulation using `nvt_freeze.mdp`:
 gmx grompp -f nvt_freeze.mdp -c em_system_out.gro -p topol.top -n index.ndx -o nvt_freezed.tpr -maxwarn 3
 gmx mdrun -v -s nvt_freezed.tpr -deffnm nvt_system_out
 ```
+
+## Simulation Results
+Here is a trajectory animation of the NVT production run:
+
+<p align="center">
+  <img src="traj_droplet.gif" width="400" alt="Molecular Dynamics Trajectory Demo">
+</p>
