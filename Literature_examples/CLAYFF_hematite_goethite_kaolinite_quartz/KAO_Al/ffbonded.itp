@@ -1,0 +1,10 @@
+;Created using lmp2gro
+
+
+[ bondtypes ]
+;     i       j     func           b0                 kb
+     ohy     hoy     1             0.100000       463700.000640
+
+[ angletypes ]
+;      i       j       k  func                  th0                cth
+     aoy     ohy     hoy     1           109.470000          125.520000

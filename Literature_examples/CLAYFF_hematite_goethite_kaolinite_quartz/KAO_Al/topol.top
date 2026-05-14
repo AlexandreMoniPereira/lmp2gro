@@ -1,0 +1,21 @@
+;Created using lmp2gro
+;
+;	Example topology file
+;
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+;Only one of the following parameter sets should be used. Comment the other one with ";"
+
+  1             3               yes              1.0     0.0   ; UFF style (used in Case 1)
+  1             3               yes              1.0     1.0   ; Interface FF style (used in Case 2)
+
+; The force field files to be included
+#include "atomtypes.itp"
+#include "ffbonded.itp"
+#include "conf.itp"
+
+[ system ]
+Example system
+
+[ molecules ]
+KAO	1
