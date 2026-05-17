@@ -10,7 +10,7 @@ This tutorial provides a step-by-step guide for converting and simulating a Sili
 
 ### INTERFACE-FF Pre-processing Notes
 
-The LAMMPS data files for silica Q4 were generated using `msi2lmp` (distributed by the Heinz Team). To replicate the generation process:
+The LAMMPS data files for silica Q4 were generated using `msi2lmp`. To replicate the generation process:
 
 Download the INTERFACE folder from the [official website](https://bionanostructures.com/interface-md/). The following files are required for `msi2lmp`:
 1. `INTERFACE_FF_1_5/FORCE_FIELDS/cvff_interface_v1_5.frc` (Note: Use the CVFF format for compatibility with `lmp2gro`).
