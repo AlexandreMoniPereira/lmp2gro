@@ -1,7 +1,43 @@
 import re
 import argparse
 import os
+import threading
+import time
+from tqdm import tqdm
 
+
+class TqdmSpinner:
+    def __init__(self, print_text, message="Processing...", frames=None):
+        self.print_text = print_text  
+        self.message = message        
+        self.frames = frames or ["|", "/", "-", "\\"]
+        self.stop_event = threading.Event()
+        self.thread = None
+        self.pbar = None
+
+    def __enter__(self):
+        tqdm.write(self.print_text)
+        self.pbar = tqdm(desc=self.message, bar_format="{desc}", leave=False)
+        self.stop_event.clear()
+        
+        self.thread = threading.Thread(target=self._animate, daemon=True)
+        self.thread.start()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop_event.set()
+        if self.thread is not None:  
+            self.thread.join()
+        if self.pbar is not None:    
+            self.pbar.close()
+
+    def _animate(self):
+        idx = 0
+        while not self.stop_event.is_set():
+            frame = self.frames[idx % len(self.frames)]
+            self.pbar.set_description_str(f"{self.message} {frame}")
+            idx += 1
+            time.sleep(0.1)
 
 def extract_numbers(text):
     # Extract all numbers including decimals and negatives

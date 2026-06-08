@@ -109,57 +109,59 @@ if __name__ == "__main__":
     element_data=pd.read_csv( 'element_data.csv')
 
     #=================== Extracting Data ===================
-
+    print(f"Extracting and converting atom data for {atom_count} atoms.")
     atom_data,ff_types=dc.atom_data(input_file,headers_dict,atom_count,element_data,types_dict)
 
-    if bond_count>0:
-        bond_data=dc.bond_data(input_file,headers_dict,bond_count,atom_data)
-        bond_types_coeffs=dc.bond_coeffs(input_file, bond_data, headers_dict, types_dict['bond_types'])
+    with helper.TqdmSpinner(f"Extracting and converting bond data for {bond_count} bonds."):
+        if bond_count>0:
+            bond_data=dc.bond_data(input_file,headers_dict,bond_count,atom_data)
+            bond_types_coeffs=dc.bond_coeffs(input_file, bond_data, headers_dict, types_dict['bond_types'])
 
-        if helper.check_duplicate_bond_types(bond_data):
-            bond_data=dc.complete_bond_data(bond_data,bond_types_coeffs)
+            if helper.check_duplicate_bond_types(bond_data):
+                bond_data=dc.complete_bond_data(bond_data,bond_types_coeffs)
 
-        if clean ==True:
-            bond_types_coeffs, bond_coeffs, bond_data, bond_count, types_dict['bond_types'] = dcl.clean_bond_data(bond_types_coeffs, bond_types_coeffs, bond_data, bond_rm_str, bond_count, types_dict['bond_types'])
-    else:
-        bond_data=None
-        bond_types_coeffs=None
+            if clean ==True:
+                bond_types_coeffs, bond_coeffs, bond_data, bond_count, types_dict['bond_types'] = dcl.clean_bond_data(bond_types_coeffs, bond_types_coeffs, bond_data, bond_rm_str, bond_count, types_dict['bond_types'])
+        else:
+            bond_data=None
+            bond_types_coeffs=None
+    with helper.TqdmSpinner(f"Extracting and converting angle data for {angle_count} angles."):
+        if angle_count>0:
+            angle_data=dc.angle_data(input_file,headers_dict,angle_count,atom_data)
+            angle_coeffs,angle_types_coeffs,angle_style=dc.angle_coeffs(input_file, angle_data, headers_dict, types_dict['angle_types'])
 
-    if angle_count>0:
-        angle_data=dc.angle_data(input_file,headers_dict,angle_count,atom_data)
-        angle_coeffs,angle_types_coeffs,angle_style=dc.angle_coeffs(input_file, angle_data, headers_dict, types_dict['angle_types'])
+            if clean ==True:
+                angle_types_coeffs,angle_coeffs, angle_data, angle_count, types_dict['angle_types'] = dcl.clean_angle_data(angle_types_coeffs, angle_coeffs, angle_data, angle_rm_str, angle_count, types_dict['angle_types'])
 
-        if clean ==True:
-            angle_types_coeffs,angle_coeffs, angle_data, angle_count, types_dict['angle_types'] = dcl.clean_angle_data(angle_types_coeffs, angle_coeffs, angle_data, angle_rm_str, angle_count, types_dict['angle_types'])
-
-    else:
-        angle_data=None
-        angle_coeffs=None
-        angle_style=None
-
-    if dihedral_count>0:
-        dihedral_data=dc.dihedral_improper_data(input_file, headers_dict['Dihedrals'], dihedral_count, atom_data)
-        dihedral_types_coeffs,dihedral_style=dc.dihedral_coeffs(input_file, dihedral_data, headers_dict, types_dict['dihedral_types'])
-        if clean ==True:
-            dihedral_types_coeffs, dihedral_data, dihedral_count, types_dict['dihedral_types'] = dcl.clean_dihedral_data(dihedral_types_coeffs, dihedral_data, dihedral_rm_str, dihedral_count, types_dict['dihedral_types'])
-    else:
-        dihedral_data=None
-        dihedral_types_coeffs=None
-        dihedral_style=None
-
-    if improper_count>0:
-        improper_data=dc.dihedral_improper_data(input_file, headers_dict['Impropers'], improper_count, atom_data)
-        improper_types_coeffs,improper_style=dc.improper_coeffs(input_file, improper_data, headers_dict, types_dict['improper_types'])
-        if clean ==True:
-            improper_types_coeffs, improper_data, improper_count, types_dict['improper_types'] = dcl.clean_improper_data(improper_types_coeffs,  improper_data, improper_rm_str, improper_count, types_dict['improper_types'])
+        else:
+            angle_data=None
+            angle_coeffs=None
+            angle_style=None
+    with helper.TqdmSpinner(f"Extracting and converting dihedral data for {dihedral_count} dihedrals."):
+        if dihedral_count>0:
+            dihedral_data=dc.dihedral_improper_data(input_file, headers_dict['Dihedrals'], dihedral_count, atom_data)
+            dihedral_types_coeffs,dihedral_style=dc.dihedral_coeffs(input_file, dihedral_data, headers_dict, types_dict['dihedral_types'])
+            if clean ==True:
+                dihedral_types_coeffs, dihedral_data, dihedral_count, types_dict['dihedral_types'] = dcl.clean_dihedral_data(dihedral_types_coeffs, dihedral_data, dihedral_rm_str, dihedral_count, types_dict['dihedral_types'])
+        else:
+            dihedral_data=None
+            dihedral_types_coeffs=None
+            dihedral_style=None
     
-    else:
-        improper_data=None
-        improper_types_coeffs=None
-        improper_style=None
+    with helper.TqdmSpinner(f"Extracting and converting improper data for {improper_count} impropers."):
+        if improper_count>0:
+            improper_data=dc.dihedral_improper_data(input_file, headers_dict['Impropers'], improper_count, atom_data)
+            improper_types_coeffs,improper_style=dc.improper_coeffs(input_file, improper_data, headers_dict, types_dict['improper_types'])
+            if clean ==True:
+                improper_types_coeffs, improper_data, improper_count, types_dict['improper_types'] = dcl.clean_improper_data(improper_types_coeffs,  improper_data, improper_rm_str, improper_count, types_dict['improper_types'])
+        
+        else:
+            improper_data=None
+            improper_types_coeffs=None
+            improper_style=None
 
     #=================== Writing gromacs files ===================
-    
+    print(f"Writing GROMACS files on the {output_folder} folder.")
     dw.write_bonded_info(output_folder, types_dict, 
                          bond_count, bond_types_coeffs,
                          angle_count, angle_types_coeffs, angle_coeffs, angle_style,
