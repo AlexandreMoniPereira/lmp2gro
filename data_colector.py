@@ -127,7 +127,7 @@ def angle_coeffs(input_file, angle_data, headers_dict, angle_types):
         column_names = ['angle_type', 'k_eff_lammps', 'theta0_deg']
         angle_coeffs=pd.DataFrame(lammps_data, columns=column_names)
          
-    angle_coeffs['k_eff_gromacs']=angle_coeffs['k_eff_lammps']*4.184
+    angle_coeffs['k_eff_gromacs']=angle_coeffs['k_eff_lammps']*4.184/2
     angle_types_coeffs = angle_data[['angle_type', 'element_i', 'element_j','element_k']].drop_duplicates()
     angle_types_coeffs = angle_types_coeffs.sort_values(by='angle_type').reset_index(drop=True)
 
