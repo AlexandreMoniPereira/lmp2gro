@@ -33,10 +33,19 @@ If you utilize these files in your research, please cite the **lmp2gro** tool, t
 
 
 ```bibtex
-@misc{lmp2gro,
+@article{Pereira2026_lmp2gro,
+    author = {Moni Pereira, Alexandre and da Silva Martins, Jarede and Albuquerque, Marcelo and Costa, Luciano T.},
     title = {lmp2gro: A Python Tool for Converting LAMMPS Data Files into GROMACS Topologies},
+    journal = {Journal of Chemical Information and Modeling},
+    volume = {66},
+    number = {15},
+    pages = {8698-8704},
     year = {2026},
-    ...
+    month = {07},
+    issn = {1549-9596},
+    doi = {10.1021/acs.jcim.6c01430},
+    url = {https://doi.org/10.1021/acs.jcim.6c01430},
+    eprint = {https://pubs.acs.org/jcisd8/article-pdf/66/15/8698/66054108/acs.jcim.6c01430.pdf},
 }
 
 @article{Cygan2004_Clayff,
